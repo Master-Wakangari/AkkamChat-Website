@@ -406,19 +406,14 @@
             background: var(--light-grey);
         }
 
-        .message {
+        .chat-message {
             display: flex;
             margin-bottom: 15px;
             gap: 10px;
         }
 
-        .message.bot-message {
+        .chat-message.bot-message {
             align-items: flex-start;
-        }
-
-        .message.user-message {
-            align-items: flex-end;
-            justify-content: flex-end;
         }
 
         .message-avatar {
@@ -434,26 +429,12 @@
             flex-shrink: 0;
         }
 
-        .message-avatar.user-avatar {
-            background: var(--dark-grey);
-        }
-
         .message-content {
             background: var(--white);
             padding: 15px;
             border-radius: 18px;
             max-width: 70%;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .message-content.user-message {
-            background: var(--primary-blue);
-            color: white;
-        }
-
-        .message-content.error-message {
-            background: #ffebee;
-            color: #c62828;
         }
 
         .chat-input-area {
@@ -715,10 +696,6 @@
             .quick-questions {
                 flex-direction: column;
             }
-            
-            .message-content {
-                max-width: 85%;
-            }
         }
     </style>
 </head>
@@ -803,6 +780,7 @@
     <section class="app-icon-section">
         <div class="container">
             <div class="app-icon-container">
+                <!-- REPLACE THIS IMG TAG WITH YOUR ACTUAL ICON -->
                 <div class="app-icon-large">
                     <img src="Images/AkkamChat.png" alt="AkkamChat Icon">
                 </div>
@@ -906,7 +884,7 @@
             <div class="chatbot-container">
                 <div class="chat-interface">
                     <div class="chat-messages" id="chatMessages">
-                        <div class="message bot-message">
+                        <div class="chat-message bot-message">
                             <div class="message-avatar">🤖</div>
                             <div class="message-content">
                                 <p>Hello! I can answer questions about AkkamChat features, pricing, security, and usage. What would you like to know?</p>
@@ -1017,12 +995,14 @@
         
         // Add user message
         const userMessage = document.createElement('div');
-        userMessage.className = 'message user-message';
+        userMessage.className = 'chat-message';
+        userMessage.style.alignItems = 'flex-end';
+        userMessage.style.justifyContent = 'flex-end';
         userMessage.innerHTML = `
-            <div class="message-content user-message">
+            <div class="message-content" style="background: var(--primary-blue); color: white;">
                 <p>${question}</p>
             </div>
-            <div class="message-avatar user-avatar">👤</div>
+            <div class="message-avatar" style="background: var(--dark-grey);">👤</div>
         `;
         chatMessages.appendChild(userMessage);
         
@@ -1031,7 +1011,7 @@
         
         // Show loading
         const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'message bot-message';
+        loadingMessage.className = 'chat-message bot-message';
         loadingMessage.innerHTML = `
             <div class="message-avatar">🤖</div>
             <div class="message-content">
@@ -1056,7 +1036,7 @@
             
             // Add bot response
             const botMessage = document.createElement('div');
-            botMessage.className = 'message bot-message';
+            botMessage.className = 'chat-message bot-message';
             botMessage.innerHTML = `
                 <div class="message-avatar">🤖</div>
                 <div class="message-content">
@@ -1071,10 +1051,10 @@
             
             // Show error
             const errorMessage = document.createElement('div');
-            errorMessage.className = 'message bot-message';
+            errorMessage.className = 'chat-message bot-message';
             errorMessage.innerHTML = `
                 <div class="message-avatar">🤖</div>
-                <div class="message-content error-message">
+                <div class="message-content" style="background: #ffebee; color: #c62828;">
                     <p>Sorry, I'm having trouble connecting right now.</p>
                 </div>
             `;
