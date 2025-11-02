@@ -381,6 +381,137 @@
             100% { transform: scale(1); opacity: 0.7; }
         }
 
+        /* FAQ Chatbot Section */
+        .faq-chatbot-section {
+            padding: 80px 0;
+            background-color: var(--white);
+        }
+
+        .chatbot-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-interface {
+            background: var(--white);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            height: 300px;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--light-grey);
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 15px;
+            gap: 10px;
+        }
+
+        .message.bot-message {
+            align-items: flex-start;
+        }
+
+        .message.user-message {
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.user-avatar {
+            background: var(--dark-grey);
+        }
+
+        .message-content {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 18px;
+            max-width: 70%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .message-content.user-message {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .message-content.error-message {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid var(--light-grey);
+        }
+
+        .quick-questions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .quick-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--light-grey);
+            border-radius: 25px;
+            font-size: 16px;
+        }
+
+        .send-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .send-btn:hover {
+            background: var(--dark-blue);
+        }
+
         /* Download Section */
         .download {
             padding: 80px 0;
@@ -580,6 +711,14 @@
                 flex-direction: column;
                 align-items: center;
             }
+
+            .quick-questions {
+                flex-direction: column;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
@@ -589,7 +728,6 @@
         <div class="container">
             <nav class="navbar">
                 <div class="logo">
-
                     <div class="logo-icon">
                         <img src="Images/AkkamChat.png" alt="AkkamChat Icon">
                     </div>
@@ -665,7 +803,6 @@
     <section class="app-icon-section">
         <div class="container">
             <div class="app-icon-container">
-                <!-- REPLACE THIS IMG TAG WITH YOUR ACTUAL ICON -->
                 <div class="app-icon-large">
                     <img src="Images/AkkamChat.png" alt="AkkamChat Icon">
                 </div>
@@ -758,6 +895,43 @@
         </div>
     </section>
 
+    <!-- FAQ Chatbot Section -->
+    <section class="faq-chatbot-section">
+        <div class="container">
+            <div class="section-title">
+                <h2>FAQ Chatbot</h2>
+                <p>Get instant answers to common questions about AkkamChat</p>
+            </div>
+            
+            <div class="chatbot-container">
+                <div class="chat-interface">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot-message">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <p>Hello! I can answer questions about AkkamChat features, pricing, security, and usage. What would you like to know?</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-area">
+                        <div class="quick-questions">
+                            <button onclick="askQuickFAQ('What is AkkamChat?')" class="quick-btn">What is AkkamChat?</button>
+                            <button onclick="askQuickFAQ('Is AkkamChat free?')" class="quick-btn">Is it free?</button>
+                            <button onclick="askQuickFAQ('How secure is AkkamChat?')" class="quick-btn">Security features</button>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="faqQuestion" placeholder="Ask about AkkamChat..." class="chat-input">
+                            <button onclick="askFAQBot()" class="send-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Download Section -->
     <section class="download" id="download">
         <div class="container">
@@ -832,6 +1006,96 @@
             </div>
         </div>
     </footer>
+
+    <!-- FAQ Chatbot JavaScript -->
+    <script>
+    async function askFAQBot() {
+        const question = document.getElementById('faqQuestion').value;
+        const chatMessages = document.getElementById('chatMessages');
+        
+        if (!question.trim()) return;
+        
+        // Add user message
+        const userMessage = document.createElement('div');
+        userMessage.className = 'message user-message';
+        userMessage.innerHTML = `
+            <div class="message-content user-message">
+                <p>${question}</p>
+            </div>
+            <div class="message-avatar user-avatar">👤</div>
+        `;
+        chatMessages.appendChild(userMessage);
+        
+        // Clear input
+        document.getElementById('faqQuestion').value = '';
+        
+        // Show loading
+        const loadingMessage = document.createElement('div');
+        loadingMessage.className = 'message bot-message';
+        loadingMessage.innerHTML = `
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <p>Thinking...</p>
+            </div>
+        `;
+        chatMessages.appendChild(loadingMessage);
+        
+        try {
+            const response = await fetch('http://3.17.163.121:3000/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: question })
+            });
+            
+            const data = await response.json();
+            
+            // Remove loading message
+            chatMessages.removeChild(loadingMessage);
+            
+            // Add bot response
+            const botMessage = document.createElement('div');
+            botMessage.className = 'message bot-message';
+            botMessage.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <p>${data.response}</p>
+                </div>
+            `;
+            chatMessages.appendChild(botMessage);
+            
+        } catch (error) {
+            // Remove loading message
+            chatMessages.removeChild(loadingMessage);
+            
+            // Show error
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'message bot-message';
+            errorMessage.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content error-message">
+                    <p>Sorry, I'm having trouble connecting right now.</p>
+                </div>
+            `;
+            chatMessages.appendChild(errorMessage);
+        }
+        
+        // Scroll to bottom
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function askQuickFAQ(question) {
+        document.getElementById('faqQuestion').value = question;
+        askFAQBot();
+    }
+
+    // Allow Enter key to send
+    document.getElementById('faqQuestion').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            askFAQBot();
+        }
+    });
+    </script>
 </body>
 </html>
-
