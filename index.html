@@ -385,18 +385,28 @@
         .faq-chatbot-section {
             padding: 80px 0;
             background-color: var(--white);
+            display: block !important;
         }
 
         .chatbot-container {
             max-width: 800px;
             margin: 0 auto;
-        }
-
-        .chat-interface {
             background: var(--white);
             border-radius: 15px;
             box-shadow: var(--shadow);
             overflow: hidden;
+        }
+
+        .chat-header {
+            background: var(--primary-blue);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 24px;
         }
 
         .chat-messages {
@@ -416,6 +426,11 @@
             align-items: flex-start;
         }
 
+        .chat-message.user-message {
+            align-items: flex-end;
+            justify-content: flex-end;
+        }
+
         .message-avatar {
             width: 40px;
             height: 40px;
@@ -429,12 +444,21 @@
             flex-shrink: 0;
         }
 
+        .user-message .message-avatar {
+            background: var(--dark-grey);
+        }
+
         .message-content {
             background: var(--white);
             padding: 15px;
             border-radius: 18px;
             max-width: 70%;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-message .message-content {
+            background: var(--primary-blue);
+            color: white;
         }
 
         .chat-input-area {
@@ -713,8 +737,8 @@
                 <div class="nav-links">
                     <a href="#features">Features</a>
                     <a href="#Akkam">Akkam AI</a>
+                    <a href="#faq-chatbot">FAQ Bot</a>
                     <a href="#download">Download</a>
-                    <a href="#about">About</a>
                 </div>
             </nav>
         </div>
@@ -780,7 +804,6 @@
     <section class="app-icon-section">
         <div class="container">
             <div class="app-icon-container">
-                <!-- REPLACE THIS IMG TAG WITH YOUR ACTUAL ICON -->
                 <div class="app-icon-large">
                     <img src="Images/AkkamChat.png" alt="AkkamChat Icon">
                 </div>
@@ -874,7 +897,7 @@
     </section>
 
     <!-- FAQ Chatbot Section -->
-    <section class="faq-chatbot-section">
+    <section class="faq-chatbot-section" id="faq-chatbot">
         <div class="container">
             <div class="section-title">
                 <h2>FAQ Chatbot</h2>
@@ -882,28 +905,30 @@
             </div>
             
             <div class="chatbot-container">
-                <div class="chat-interface">
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="chat-message bot-message">
-                            <div class="message-avatar">🤖</div>
-                            <div class="message-content">
-                                <p>Hello! I can answer questions about AkkamChat features, pricing, security, and usage. What would you like to know?</p>
-                            </div>
+                <div class="chat-header">
+                    <h3><i class="fas fa-robot"></i> AkkamChat Assistant</h3>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <div class="chat-message bot-message">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <p>Hello! I'm here to help answer any questions you have about AkkamChat. Ask me about features, security, pricing, or anything else!</p>
                         </div>
                     </div>
-                    
-                    <div class="chat-input-area">
-                        <div class="quick-questions">
-                            <button onclick="askQuickFAQ('What is AkkamChat?')" class="quick-btn">What is AkkamChat?</button>
-                            <button onclick="askQuickFAQ('Is AkkamChat free?')" class="quick-btn">Is it free?</button>
-                            <button onclick="askQuickFAQ('How secure is AkkamChat?')" class="quick-btn">Security features</button>
-                        </div>
-                        <div class="input-group">
-                            <input type="text" id="faqQuestion" placeholder="Ask about AkkamChat..." class="chat-input">
-                            <button onclick="askFAQBot()" class="send-btn">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="quick-questions">
+                        <button onclick="askQuickFAQ('What is AkkamChat?')" class="quick-btn">What is AkkamChat?</button>
+                        <button onclick="askQuickFAQ('Is AkkamChat free to use?')" class="quick-btn">Is it free?</button>
+                        <button onclick="askQuickFAQ('How secure is AkkamChat?')" class="quick-btn">Security features</button>
+                        <button onclick="askQuickFAQ('How does Akkam AI work?')" class="quick-btn">Akkam AI</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="faqQuestion" placeholder="Ask about AkkamChat..." class="chat-input">
+                        <button onclick="askFAQBot()" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -987,95 +1012,148 @@
 
     <!-- FAQ Chatbot JavaScript -->
     <script>
-    async function askFAQBot() {
-        const question = document.getElementById('faqQuestion').value;
-        const chatMessages = document.getElementById('chatMessages');
+        // =============================================
+        // OPENAI INTEGRATION SECTION - ADD YOUR NODE.JS BACKEND CALL HERE
+        // =============================================
         
-        if (!question.trim()) return;
+        // This function calls your Node.js backend which handles the OpenAI integration
+        async function callOpenAIBackend(question) {
+            try {
+                const response = await fetch('/api/chat', { // Your backend endpoint
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ question: question })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Backend request failed');
+                }
+                
+                const data = await response.json();
+                return data.answer;
+            } catch (error) {
+                console.error('Error calling backend:', error);
+                return null;
+            }
+        }
         
-        // Add user message
-        const userMessage = document.createElement('div');
-        userMessage.className = 'chat-message';
-        userMessage.style.alignItems = 'flex-end';
-        userMessage.style.justifyContent = 'flex-end';
-        userMessage.innerHTML = `
-            <div class="message-content" style="background: var(--primary-blue); color: white;">
-                <p>${question}</p>
-            </div>
-            <div class="message-avatar" style="background: var(--dark-grey);">👤</div>
-        `;
-        chatMessages.appendChild(userMessage);
+        // =============================================
+        // END OF OPENAI INTEGRATION SECTION
+        // =============================================
         
-        // Clear input
-        document.getElementById('faqQuestion').value = '';
-        
-        // Show loading
-        const loadingMessage = document.createElement('div');
-        loadingMessage.className = 'chat-message bot-message';
-        loadingMessage.innerHTML = `
-            <div class="message-avatar">🤖</div>
-            <div class="message-content">
-                <p>Thinking...</p>
-            </div>
-        `;
-        chatMessages.appendChild(loadingMessage);
-        
-        try {
-            const response = await fetch('http://3.17.163.121:3000/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: question })
-            });
+        // Temporary FAQ responses for common questions (fallback)
+        const faqResponses = {
+            "what is akkamchat": "AkkamChat is a cloud-based instant messaging and voice calling app with integrated AI assistant. It allows you to send messages, photos, videos, and files of any type with end-to-end encryption.",
+            "is akkamchat free": "Yes! AkkamChat is completely free to use for personal messaging. We offer optional premium features for businesses and power users.",
+            "how secure is akkamchat": "AkkamChat uses end-to-end encryption for all messages, calls, and media. Your conversations are secured with military-grade encryption that only you and the recipient can access.",
+            "how does akkam ai work": "Akkam AI is our intelligent assistant built into the app. It can help with tasks, answer questions, provide entertainment, and learn from your conversations to offer personalized assistance.",
+            "can i use akkamchat on multiple devices": "Yes! AkkamChat is cloud-based, so you can access your messages from multiple devices simultaneously - your phone, tablet, and computer.",
+            "what file types can i share": "You can share any file type up to 2GB each, including documents, images, videos, audio files, and more. All files are stored securely in the cloud.",
+            "how many people can be in a group": "AkkamChat supports groups with up to 200,000 members with advanced admin tools and moderation features.",
+            "what makes akkamchat different": "AkkamChat combines lightning-fast messaging with our unique Akkam AI assistant, end-to-end encryption, and the ability to share large files - all in one free app."
+        };
+
+        async function askFAQBot() {
+            const question = document.getElementById('faqQuestion').value;
+            const chatMessages = document.getElementById('chatMessages');
             
-            const data = await response.json();
+            if (!question.trim()) return;
             
-            // Remove loading message
-            chatMessages.removeChild(loadingMessage);
+            // Add user message
+            const userMessage = document.createElement('div');
+            userMessage.className = 'chat-message user-message';
+            userMessage.innerHTML = `
+                <div class="message-content">
+                    <p>${question}</p>
+                </div>
+                <div class="message-avatar">👤</div>
+            `;
+            chatMessages.appendChild(userMessage);
             
-            // Add bot response
-            const botMessage = document.createElement('div');
-            botMessage.className = 'chat-message bot-message';
-            botMessage.innerHTML = `
+            // Clear input
+            document.getElementById('faqQuestion').value = '';
+            
+            // Show loading
+            const loadingMessage = document.createElement('div');
+            loadingMessage.className = 'chat-message bot-message';
+            loadingMessage.innerHTML = `
                 <div class="message-avatar">🤖</div>
                 <div class="message-content">
-                    <p>${data.response}</p>
+                    <p><i class="fas fa-spinner fa-spin"></i> Thinking...</p>
                 </div>
             `;
-            chatMessages.appendChild(botMessage);
+            chatMessages.appendChild(loadingMessage);
             
-        } catch (error) {
-            // Remove loading message
-            chatMessages.removeChild(loadingMessage);
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
             
-            // Show error
-            const errorMessage = document.createElement('div');
-            errorMessage.className = 'chat-message bot-message';
-            errorMessage.innerHTML = `
-                <div class="message-avatar">🤖</div>
-                <div class="message-content" style="background: #ffebee; color: #c62828;">
-                    <p>Sorry, I'm having trouble connecting right now.</p>
-                </div>
-            `;
-            chatMessages.appendChild(errorMessage);
+            try {
+                // Call your Node.js backend
+                const aiResponse = await callOpenAIBackend(question);
+                
+                // Remove loading message
+                chatMessages.removeChild(loadingMessage);
+                
+                let answer;
+                if (aiResponse) {
+                    answer = aiResponse;
+                } else {
+                    // Fallback to local responses if API fails
+                    const lowerQuestion = question.toLowerCase();
+                    answer = "I'm not sure about that specific question. Could you try asking about AkkamChat's features, security, pricing, or how to use the app?";
+                    
+                    for (const [key, value] of Object.entries(faqResponses)) {
+                        if (lowerQuestion.includes(key)) {
+                            answer = value;
+                            break;
+                        }
+                    }
+                }
+                
+                // Add bot response
+                const botMessage = document.createElement('div');
+                botMessage.className = 'chat-message bot-message';
+                botMessage.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <p>${answer}</p>
+                    </div>
+                `;
+                chatMessages.appendChild(botMessage);
+                
+            } catch (error) {
+                // Remove loading message
+                chatMessages.removeChild(loadingMessage);
+                
+                // Show error message
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'chat-message bot-message';
+                errorMessage.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">
+                        <p>Sorry, I'm having trouble connecting right now. Please try again later.</p>
+                    </div>
+                `;
+                chatMessages.appendChild(errorMessage);
+            }
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-        
-        // Scroll to bottom
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
 
-    function askQuickFAQ(question) {
-        document.getElementById('faqQuestion').value = question;
-        askFAQBot();
-    }
-
-    // Allow Enter key to send
-    document.getElementById('faqQuestion').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
+        function askQuickFAQ(question) {
+            document.getElementById('faqQuestion').value = question;
             askFAQBot();
         }
-    });
+
+        // Allow Enter key to send
+        document.getElementById('faqQuestion').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askFAQBot();
+            }
+        });
     </script>
 </body>
 </html>
